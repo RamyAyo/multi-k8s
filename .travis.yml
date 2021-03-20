@@ -4,19 +4,33 @@ services:
     - docker
     
 before_install:
-    - docker build -t ramyayoub/docker-react -f Dockerfile.dev .
+    - docker build -t ramyayoub/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run -e CI=true ramyayoub/docker-react npm run test
+  - docker run -e CI=true ramyayoub/react-test npm test
   
-deploy:
-    provider: elasticbeanstalk
-    region: "us-east-2"
-    app: "Docker-react"
-    env: "Dockerreact-env"
-    bucket_name: "elasticbeanstalk-us-east-2-526215871066"
-    bucket_path: "Dockerreact"
-    on:
-        branch: main
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_SECRET_KEY
+after_success:
+   - docker build -t ramyayoub/multi-client ./client  
+   - docker build -t ramyayoub/multi-nginx ./nginx  
+   - docker build -t ramyayoub/multi-server ./server  
+   - docker build -t ramyayoub/multi-worker ./worker 
+
+    #Login to the docker CLI   
+    - echo "$DOCKER_PASSWORD" | docker login -u | "$DOCKER_ID" --password-stdin
+    #Take these images and push them to docker hub
+    - docker push ramyayoub/multi-client
+    - docker push ramyayoub/multi-nginx    
+    - docker push ramyayoub/multi-server    
+    - docker push ramyayoub/multi-worker
+    
+#deploy:
+ #   provider: elasticbeanstalk
+  #  region: "us-east-2"
+   # app: "Docker-react"
+ #    env: "Dockerreact-env"
+  #   bucket_name: "elasticbeanstalk-us-east-2-526215871066"
+   #  bucket_path: "Dockerreact"
+    # on:
+      #   branch: main
+     #access_key_id: $AWS_ACCESS_KEY
+     #secret_access_key: $AWS_SECRET_KEY
