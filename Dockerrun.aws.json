@@ -1,0 +1,14 @@
+{
+   "AWSEBDockerrunVersion": 2,
+   "containerDefinitions": [
+      {
+	     "name": "clientt",
+		 "image": "ramyayo/multi-client",
+		 "hostname": "client",
+	  
+	  }
+   
+   
+   ]
+
+}
