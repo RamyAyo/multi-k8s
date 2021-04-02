@@ -20,7 +20,7 @@ before_install:
    - gcloud config set project sodium-daylight-309420
    #Enter project ide we are using in google cloud
    - gcloud config set compute/zone us-central1-c
-   - glcloud container clusters get-credentials cluster-1
+   - gcloud container clusters get-credentials cluster-1
    #update cluster with a script in the travis file
    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
    - docker build -t ramyayoub/react-test -f ./client/Dockerfile.dev ./client/Dockerfile.dev
