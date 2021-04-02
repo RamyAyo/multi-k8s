@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: postgres-deployment
+spec:
+   replicas: 1
+#Single POD running the multi postgres image
+   selector:
+      matchLabels:
+         component: postgres
+   template:
+      metadata:
+         labels:
+            component: postgres
+      spec:
+         volumes:
+            - name: postgres-storage
+              persistentVolumeClaim:
+                 claimName: database-persistent-volume-claim
+#Tell Kubernets to go to hard drive or cloud provider and somehow get some slice of storage that has 2Gi and of the readmanyonce
+         containers:
+# Pod wil run a single container - postgres
+            - name: postgres        
+              image: postgres     
+              ports:
+                 - containerPort: 5432 
+              volumeMounts:
+                 - name: postgres-storage   
+                   mountPath:  /va/lib/postresql/data  
+                   subPath: postgres                   
+#Where Postgres stores its data, so mounting the volume to this link  and folder (subpath)                 
+              env:
+                 - name: POSTGRES_PASSWORD 
+                   valueFrom:
+                     secretKeyRef:
+                        name: pgpassword
+                        key: PGPASSWORD 

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: redis-deployment
+spec:
+   replicas: 1
+#Single POD running the multi redis image
+   selector:
+      matchLabels:
+         component: redis
+   template:
+      metadata:
+         labels:
+            component: redis
+      spec:
+         containers:
+# Pod wil run a single container - redis
+            - name: redis        
+              image: redis     
+              ports:
+                - containerPort: 6379              
+            

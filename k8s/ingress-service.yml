@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1beta1
+# UPDATE THE API
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    # ADD THIS LINE ABOVE
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # UPDATE THIS LINE ABOVE
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /?(.*)
+          # Message received with / followed by anything else besides api, then route to the client
+            backend:
+              serviceName: client-cluster-ip-service
+              servicePort: 3000
+          - path: /api/?(.*)
+          # if http message recieved with /api in the route pathm then send to server
+            backend:
+              serviceName: server-cluster-ip-service
+              servicePort: 5000
+
+        
+            

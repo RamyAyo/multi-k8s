@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+# Not an actual request for a volume
+metadata:
+   name: database-persistent-volume-claim
+spec:
+   accessModes: 
+      - ReadWriteOnce
+# 3 different types of acces modes ReadWriteOnce - can be used by a single node 
+#ReadOnlyMany - Multiple nodes can read this volume ReadWriteMany - can be read or written by multiple nodes
+   resources:
+      requests:
+         storage: 2Gi
+#2 gigabyte worth of storage on  your hard disk. On a cloud environment, you may get AWS BlockStore or on
+# Open Stack you get Cindervolume. 
+
+            

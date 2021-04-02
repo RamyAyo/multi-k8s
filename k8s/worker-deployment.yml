@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: worker-deployment
+spec:
+   replicas: 1
+#Single POD running the multi worker image
+   selector:
+      matchLabels:
+         component: worker
+   template:
+      metadata:
+         labels:
+            component: worker
+      spec:
+         containers:
+# Pod wil run a single container - worker
+            - name: worker        
+              image: stephengrider/multi-worker 
+              env:
+                 - name:  REDIS_HOST
+                   value: redis-cluster-ip-service
+#Name of the ClustIP service that connects to the REDIS database.                   
+                 - name:  REDIS_PORT
+                   value: '6379'           
