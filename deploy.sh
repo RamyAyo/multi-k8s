@@ -1,6 +1,6 @@
-docker build -t ramyayoub/multi-client:latest -t ramyayoub/multi-client:$SHA -f ./client/Docerfile ./client
-docker build -t ramyayoub/multi-server:latest -t ramyayoub/multi-server:$SHA -f ./server/Docerfile ./server
-docker build -t ramyayoub/multi-worker:latest -t ramyayoub/multi-worker:$SHA -f ./worker/Docerfile ./worker
+docker build -t ramyayoub/multi-client:latest -t ramyayoub/multi-client:$SHA -f ./client/Dockerfile ./client
+docker build -t ramyayoub/multi-server:latest -t ramyayoub/multi-server:$SHA -f ./server/Dockerfile ./server
+docker build -t ramyayoub/multi-worker:latest -t ramyayoub/multi-worker:$SHA -f ./worker/Dockerfile ./worker
 #Build our images
 #Now push them to docker hub
 docker push ramyayoub/multi-client:latest
