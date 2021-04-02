@@ -1,36 +1,39 @@
-language: generic
 sudo: required
 services:
-    - docker
-    
+   - docker
+   #New docker services to build container
+env:
+   global:
+      - SHA=$(git rev-parse HEAD)
+      - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      
 before_install:
-    - docker build -t ramyayoub/react-test -f ./client/Dockerfile.dev ./client
-
+   - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
+   #uncrypts the service-account.json file and place it in our root directory for use for the gcloud auth command below
+   - curl https://sdk.cloud.google.com |  bash > /dev/null;
+   #downloads the google cloud sdk 
+   - source $HOME/google-cloud-sdk/path.bash.inc
+   - gcloud components update kubectl
+   #install kubectl in travis environment
+   - gcloud auth activate-service-account --key-file service-account.json
+   #service-account.json will be a file that contains our credentials
+   - gcloud config set project sodium-daylight-309420
+   #Enter project ide we are using in google cloud
+   - gcloud config set compute/zone us-central1-c
+   - glcloud container clusters get-credentials cluster-1
+   #update cluster with a script in the travis file
+   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+   - docker build -t ramyayoub/react-test -f ./client/Dockerfile.dev ./client/Dockerfile.dev
+   
 script:
-  - docker run -e CI=true ramyayoub/react-test npm test
-  
-after_success:
-   - docker build -t ramyayoub/multi-client ./client  
-   - docker build -t ramyayoub/multi-nginx ./nginx  
-   - docker build -t ramyayoub/multi-server ./server  
-   - docker build -t ramyayoub/multi-worker ./worker 
+  - docker run -e CI=true ramyayoub/react-test npm test   
+#Run tests for the project
 
-    #Login to the docker CLI   
-    - echo "$DOCKER_PASSWORD" | docker login -u | "$DOCKER_ID" --password-stdin
-    #Take these images and push them to docker hub
-    - docker push ramyayoub/multi-client
-    - docker push ramyayoub/multi-nginx    
-    - docker push ramyayoub/multi-server    
-    - docker push ramyayoub/multi-worker
-    
-#deploy:
- #   provider: elasticbeanstalk
-  #  region: "us-east-2"
-   # app: "Docker-react"
- #    env: "Dockerreact-env"
-  #   bucket_name: "elasticbeanstalk-us-east-2-526215871066"
-   #  bucket_path: "Dockerreact"
-    # on:
-      #   branch: main
-     #access_key_id: $AWS_ACCESS_KEY
-     #secret_access_key: $AWS_SECRET_KEY
+deploy:
+   provider: script
+   #tell Travis just run the script file
+   script: bash ./deploy.sh
+   #deploy.sh will handle the deployment commands to Kubernetes
+   on:
+      branch: main
+   
